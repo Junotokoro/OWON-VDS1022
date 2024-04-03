@@ -1084,6 +1084,10 @@ class Frames(tuple):
         else:
             return self.to_dataframe().plot(backend=backend, **kwargs)
 
+    def save(self, name='figure.png', **kwargs):
+        from vds1022 import plotter
+        plotter.MatplotlibChart(self, kwargs).save()
+        
 
     def to_dataframe(self):
         """

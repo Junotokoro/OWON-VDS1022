@@ -81,7 +81,7 @@ class BokehChart:
         axe_opts = [ { k:v[i] for k,v in opts.items() if k not in fig_opts }
                      for i in range(len(lines)) ]
 
-        p = bokeh.plotting.Figure(**fig_opts)
+        p = bokeh.plotting.figure(**fig_opts)
         p.grid.grid_line_alpha = 0.5
         p.toolbar.logo = None
 
@@ -116,14 +116,14 @@ class BokehChart:
             formatter = self._FORMATTERS.get(xscale)
             if formatter:
                 ax.minor_tick_line_color = None
-                ax.formatter = bokeh.models.FuncTickFormatter(code=formatter)
+                ax.formatter = bokeh.models.CustomJSTickFormatter(code=formatter)
 
         for ax in p.yaxis:
             ax.ticker.desired_num_ticks = 10
             formatter = self._FORMATTERS.get(yscale)
             if formatter:
                 ax.minor_tick_line_color = None
-                ax.formatter = bokeh.models.FuncTickFormatter(code=formatter)
+                ax.formatter = bokeh.models.CustomJSTickFormatter(code=formatter)
 
         # if yscale == 'log':
         #     p.ygrid.minor_grid_line_color = 'gray'
@@ -218,6 +218,7 @@ class BokehChart:
 
         assert self.handle is not None
         bokeh.io.push_notebook(handle=self.handle)
+        # bokeh.io.show(self.handle)
 
 
 
@@ -307,15 +308,20 @@ class MatplotlibChart:
         axlines = [ ln for ax in fig.axes for ln in ax.lines ]
         fig.axes[0].legend(handles=axlines
                             , loc='upper left'
-                            , bbox_to_anchor=(0, 1.1)
+                            , bbox_to_anchor=(0, 1.13)
                             , ncol=2
                             , frameon=False)
 
         plt.title(title)
+        self.plt = plt
 
 
     def show(self):
-        return self
+        # return self
+        return self.plt.show()
+    
+    def save(self, name):
+        self.plt.savefig(name)
 
 
 
