@@ -1084,9 +1084,14 @@ class Frames(tuple):
         else:
             return self.to_dataframe().plot(backend=backend, **kwargs)
 
-    def save(self, name='figure.png', **kwargs):
-        from vds1022 import plotter
-        plotter.MatplotlibChart(self, kwargs).save()
+    def save(self, filename, backend='bokeh', **kwargs):
+        if backend == 'bokeh':
+            from vds1022 import plotter
+            if ".html" not in filename: filename += ".html"
+            plotter.BokehChart(self, kwargs).save(filename)
+        elif backend == 'matplotlib':
+            from vds1022 import plotter
+            plotter.MatplotlibChart(self, kwargs).save(filename)
         
 
     def to_dataframe(self):

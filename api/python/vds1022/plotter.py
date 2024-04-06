@@ -30,7 +30,7 @@ class BokehChart:
             "return +v.toPrecision(5) + (n ? 'pnµm_kMG'[n+4] : '');",
     }
 
-    def __init__(self, data, opts, rollover=None):
+    def __init__(self, data, opts, rollover=None, title="Bokeh plot"):
         import bokeh.io, bokeh.plotting, bokeh.models, bokeh.models.tools
 
         self.xy_mode = opts.pop('xy_mode', False)
@@ -63,8 +63,8 @@ class BokehChart:
 
         labels = opts.pop('label', [ d.get('name', str(i)) for i, d in enumerate(lines) ])
 
-        opts.setdefault('frame_width', opts.pop('width', 600))
-        opts.setdefault('frame_height', opts.pop('height', 250))
+        # opts.setdefault('frame_width', opts.pop('width', 600))
+        # opts.setdefault('frame_height', opts.pop('height', 250))
         opts.setdefault('lod_interval', 0)
         opts.setdefault('x_axis_label', opts.pop('xlabel', None))
         opts.setdefault('y_axis_label', opts.pop('ylabel', None))
@@ -75,6 +75,9 @@ class BokehChart:
         opts.setdefault('tools', 'xpan,xwheel_zoom,xzoom_in,xzoom_out,xbox_zoom,crosshair,save,reset')
         opts.setdefault('legend_label', labels)
         opts.setdefault('output_backend', 'canvas')  # webgl or canvas
+        opts.setdefault('margin', [100, 100])
+        opts.setdefault('sizing_mode', "stretch_both")
+        opts.setdefault('title', title)
 
         axe_kw = set('alpha,color,muted,visible,legend_field,legend_group,legend_label'.split(','))
         fig_opts = { k:v for k,v in opts.items() if not (k in axe_kw or k.startswith('line_')) }
@@ -83,6 +86,8 @@ class BokehChart:
 
         p = bokeh.plotting.figure(**fig_opts)
         p.grid.grid_line_alpha = 0.5
+        p.title.align = "center"
+        p.title.text_font_size = "25px"
         p.toolbar.logo = None
 
         ds = bokeh.models.ColumnDataSource(data={})
@@ -220,6 +225,11 @@ class BokehChart:
         bokeh.io.push_notebook(handle=self.handle)
         # bokeh.io.show(self.handle)
 
+    def save(self, filename):
+        from bokeh.plotting import output_file, save
+        
+        output_file(filename=filename)
+        save(self.figure)
 
 
 class MatplotlibChart:
@@ -318,7 +328,7 @@ class MatplotlibChart:
 
     def show(self):
         # return self
-        return self.plt.show()
+        self.plt.show()
     
     def save(self, name):
         self.plt.savefig(name)
