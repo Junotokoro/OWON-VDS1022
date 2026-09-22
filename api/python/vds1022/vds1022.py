@@ -1531,10 +1531,20 @@ class VDS1022:
                     self._ep_write = next( x for x in addrs if x & 0x80 == 0 )
                     self._ep_read  = next( x for x in addrs if x & 0x80 != 0 )
 
-                    # starting kernel 6.14.5, OWON is claimed by usb_simple_serial driver
-                    if usb.is_kernel_driver_active(self._handle, USB_INTERFACE):    
-                        usb.detach_kernel_driver(self._handle, USB_INTERFACE)
-                        self._reattach_kernel_driver = True
+                    # Linux may claim OWON through usb_simple_serial.  The
+                    # low-level libusb backend on Windows does not provide the
+                    # kernel-driver helpers, so call them only when available.
+                    is_kernel_driver_active = getattr(usb, "is_kernel_driver_active", None)
+                    detach_kernel_driver = getattr(usb, "detach_kernel_driver", None)
+                    if is_kernel_driver_active is not None and detach_kernel_driver is not None:
+                        try:
+                            if is_kernel_driver_active(self._handle, USB_INTERFACE):
+                                detach_kernel_driver(self._handle, USB_INTERFACE)
+                                self._reattach_kernel_driver = True
+                            else:
+                                self._reattach_kernel_driver = False
+                        except USBError:
+                            self._reattach_kernel_driver = False
                     else:
                         self._reattach_kernel_driver = False
 
