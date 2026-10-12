@@ -1085,6 +1085,16 @@ class Frames(tuple):
             return self.to_dataframe().plot(backend=backend, **kwargs)
 
     def save(self, filename, backend='bokeh', **kwargs):
+        """ Save the samples in a file.
+
+        Args:
+            filename  (str): Output file name.
+            backend   (str): Optional plotting backend. Defaults to `bokeh`.
+            title     (str): Optional chart title. Defaults to `Bokeh plot`.
+            caption   (str): Optional caption line under the chart, for example
+                             the creation date. Not displayed when empty.
+            kwargs   (dict): keyworded arguments for the backend library
+        """
         if backend == 'bokeh':
             from vds1022 import plotter
             if ".html" not in filename: filename += ".html"

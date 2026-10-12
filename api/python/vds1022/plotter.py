@@ -36,6 +36,7 @@ class BokehChart:
         self.xy_mode = opts.pop('xy_mode', False)
         xscale = opts.pop('xscale', 'clock')
         yscale = opts.pop('yscale', 'metric')
+        caption = opts.pop('caption', None)
 
         if xscale not in self._FORMATTERS:
             opts.setdefault('x_axis_type', xscale)
@@ -89,6 +90,10 @@ class BokehChart:
         p.title.align = "center"
         p.title.text_font_size = "25px"
         p.toolbar.logo = None
+
+        if caption:
+            # Caption line under the chart (for example the creation date).
+            p.add_layout(bokeh.models.Title(text=str(caption), align="center", text_font_size="14px"), 'below')
 
         ds = bokeh.models.ColumnDataSource(data={})
         y_range_name = 'default'
@@ -239,6 +244,7 @@ class MatplotlibChart:
         import matplotlib.pyplot as plt
 
         xy_mode = opts.pop('xy_mode', False)
+        caption = opts.pop('caption', None)
 
         if type(lines).__name__ == 'Frames':
             if xy_mode:
@@ -323,6 +329,10 @@ class MatplotlibChart:
                             , frameon=False)
 
         plt.title(title)
+        if caption:
+            # Caption line under the chart (for example the creation date).
+            fig.subplots_adjust(bottom=0.22)
+            fig.text(0.5, 0.02, str(caption), ha='center', va='bottom', fontsize=10)
         self.plt = plt
 
 
